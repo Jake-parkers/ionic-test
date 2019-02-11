@@ -1,0 +1,7 @@
+{
+  "name": "agrimall",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic-angular"
+}
