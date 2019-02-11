@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { InAppBrowser, InAppBrowserEvent } from '@ionic-native/in-app-browser';
+import { SafariViewController } from '@ionic-native/safari-view-controller/ngx';
 
 import { Rave, RavePayment, Misc } from 'rave-ionic3';
 @Component({
@@ -14,7 +15,8 @@ export class HomePage {
     private rave: Rave, 
     private ravePayment: RavePayment, 
     private misc:Misc, 
-    private iab: InAppBrowser
+    private iab: InAppBrowser,
+    private sf: SafariViewController
     ) {
   }
 
@@ -37,13 +39,43 @@ export class HomePage {
         .then(secure_link => {
           console.log(secure_link)
           secure_link = secure_link +" ";
-          const browser = this.iab.create(secure_link.toString());
-          // browser = document.write('<iframe width="100%" height="100%" src="'+secure_link+'" frameborder="0" allowfullscreen></iframe>');
-          browser.on("loadstop")
-          .subscribe((ev: InAppBrowserEvent) => {
-            console.log(ev);
-            if(ev.url.indexOf('guarded-lake') != -1) browser.close();
-          })
+          this.sf.isAvailable()
+          .then((available: boolean) => {
+              if (available) {
+                console.log("available: ",available)
+                this.sf.show({
+                  url: secure_link.toString(),
+                  hidden: false,
+                  animated: false,
+                  transition: 'curl',
+                  enterReaderModeIfAvailable: true,
+                  tintColor: '#ff0000'
+                })
+                .subscribe((result: any) => {
+                    if(result.event === 'opened') console.log('Opened');
+                    else if(result.event === 'loaded') {
+                      console.log(result.event);
+                      console.log("loaded");
+                    }
+                    else if(result.event === 'closed') console.log('Closed');
+                  },
+                  (error: any) => console.error(error)
+                );
+
+              } else {
+                console.log("police")
+                // use fallback browser, example InAppBrowser
+                const browser = this.iab.create(secure_link.toString(),'_self');
+                // browser["document"].write('<iframe width="100%" height="100%" src="'+secure_link+'" frameborder="0" allowfullscreen></iframe>');
+                browser.on("loadstop")
+                .subscribe((ev: InAppBrowserEvent) => {
+                  console.log(ev);
+                  if(ev.url.indexOf('guarded-lake') != -1) browser.close();
+                })
+              }
+            }
+          );
+          
           // this.rave.render(secure_link);
         }).catch(error => {
           // Error or invalid paymentObject passed in

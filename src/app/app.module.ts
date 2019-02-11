@@ -5,6 +5,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
 import { HttpClientModule } from '@angular/common/http';
+import { SafariViewController } from '@ionic-native/safari-view-controller/ngx';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
@@ -33,6 +34,7 @@ import { Rave, RavePayment, Misc } from 'rave-ionic3';
     RavePayment,
     SplashScreen,
     InAppBrowser,
+    SafariViewController,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })
